@@ -1,0 +1,8 @@
+All dataset : 172
+
+170 dataset leaf number : 60
+
+2 dataset leaf number : 120
+(A20170614151153_RT02526 5, A20170614151153_RT02526)
+log data에는 60개라고 작성되어 있으나, position의 수가 120
+위 2가지 data는 학습에서 제외하였음.
