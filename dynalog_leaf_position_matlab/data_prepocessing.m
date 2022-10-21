@@ -7,8 +7,8 @@ addpath("dynalog_function")
 % Train : 136
 % Test : 34
 
-dynalogTraindataPath = ".\raw_data\train_1st\";   % training data path
-dynalogTestdataPath = ".\raw_data\test_1st\"; % test data path
+dynalogTrainDataPath = ".\raw_data\train_1st\";   % training data path
+dynalogTestDataPath = ".\raw_data\test_1st\"; % test data path
 
 formatOut = 'yymmdd-HHMMSS';
 t_string = datestr(now, formatOut);
@@ -16,7 +16,7 @@ deeplearningDatasourcePath = sprintf("deeplearningData-%s", t_string); % result 
 mkdir(deeplearningDatasourcePath)
 %% Training data preparation
 
-dynalogList = dir(fullfile(dynalogTraindataPath,"*.dlg"));   % training data path
+dynalogList = dir(fullfile(dynalogTrainDataPath,"*.dlg"));   % training data path
 %
 iter00_input_data = [];
 iter00_output_data = [];
@@ -30,7 +30,7 @@ for iter00 = 1:size(dynalogList,1)
     % data load
     waitbar(iter00/size(dynalogList,1), f,'Training data preparation...');
 
-    struct_data = dynRead(fullfile(dynalogTraindataPath, dynalogList(iter00).name));
+    struct_data = dynRead(fullfile(dynalogTrainDataPath, dynalogList(iter00).name));
     data_label=vertcat(data_label,size(struct_data.planPosition,1));
 
     zero_colum = [] ;
@@ -59,7 +59,7 @@ for iter00 = 1:size(dynalogList,1)
 
     % make input, output data
 
-    time_step = 10;
+    time_step = 10; % deep-learning 에 입력으로 들어가는 한개 input sequence의 길이 
     data_row_size =size(struct_data.actualPosition,1) ;
     data_column_size = size(struct_data.actualPosition,2);
 
@@ -111,7 +111,7 @@ save(savepath_output_tr,'iter00_output_data');
 
 clear iter00_input_data iter00_output_data dynalogList
 %% Test data preparation
-dynalogList = dir(fullfile(dynalogTestdataPath,"*.dlg"));   % training data path
+dynalogList = dir(fullfile(dynalogTestDataPath,"*.dlg"));   % test data path
 
 iter00_input_data = [];
 iter00_output_data = [];
@@ -126,7 +126,7 @@ for iter00 = 1:size(dynalogList,1)
     % data load
     waitbar(iter00/size(dynalogList,1), f,'Training data preparation...');
 
-    struct_data = dynRead(fullfile(dynalogTestdataPath, dynalogList(iter00).name));
+    struct_data = dynRead(fullfile(dynalogTestDataPath, dynalogList(iter00).name));
     data_label=vertcat(data_label,size(struct_data.planPosition,1));
 
     zero_colum = [] ;
@@ -155,7 +155,6 @@ for iter00 = 1:size(dynalogList,1)
 
     % make input, output data
 
-    time_step = 10;
     data_row_size =size(struct_data.actualPosition,1) ;
     data_column_size = size(struct_data.actualPosition,2);
 
@@ -205,12 +204,14 @@ savepath_input_test = fullfile(deeplearningDatasourcePath, "test_input_data_1st.
 savepath_output_test = fullfile(deeplearningDatasourcePath, "test_output_data_1st.mat");
 savepath_planningData_test = fullfile(deeplearningDatasourcePath, "test_planning_data_1st.mat");
 savepath_data_label = fullfile(deeplearningDatasourcePath, "data_label_1st.mat");
+savepath_testDataIndex = fullfile(deeplearningDatasourcePath, "testDataIndex.mat")
 
 save(savepath_zeroColumn_tr,'zero_colum_index'); % actualposition에서 zero영역은 학습에 사용되지 않았음, 사용되지 않은 영역 확인용
 save(savepath_input_test,'iter00_input_data');
 save(savepath_output_test,'iter00_output_data');
 save(savepath_planningData_test,'iter00_planning_data');
 save(savepath_data_label, "data_label")
+save(savepath_testDataIndex, "dynalogList")
 disp('DONE')
 %%
 

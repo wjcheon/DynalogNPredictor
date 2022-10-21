@@ -23,18 +23,14 @@ temp_train_output = sio.loadmat(os.path.join(mat_result_path, 'train_output_data
 temp_train_output = temp_train_output['iter00_output_data']
 
 # fix parameters
-
-input_size = 6
+input_size = 6  # batch size
 num_classes = 1
-squence_length = 10
+squence_length = 10 # pre-determinded parameter
 
-# Hyper-parameters
-
+# Model hyper-parameters
 hidden_size = 20 # 30
 num_layers = 3
-
 batch_size = 1500 #
-
 learning_rate = 0.001
 
 

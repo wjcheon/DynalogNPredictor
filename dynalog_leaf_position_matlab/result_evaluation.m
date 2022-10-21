@@ -25,6 +25,9 @@ test_data_index = test_data_index -10;
 
 zero_colum_index = load(fullfile(preprocessedDataPath, 'zero_colum_index_1st.mat'));
 zero_colum_index = zero_colum_index.zero_colum_index;
+
+testDataIndex = load(fullfile(preprocessedDataPath, 'testDataIndex.mat'))
+testDataIndex= testDataIndex.dynalogList;
 %%
 
 mergedData = [prediction_data, Delevered_data, planning_data];
@@ -42,7 +45,7 @@ mean(temp_RMSE_all_plan) % 0.1706
    
 %%
 
-test_data = 30;
+test_data = 4;
 test_index_real_value = 1;
 non_zeros_size_all = [];
 
@@ -83,6 +86,7 @@ for iter01 = 1:60
     
 end
 
+[planndPositionSet, actualPositionSet, predictedPositionSet] = getLogPositionByIndex(4, planning_data, Delevered_data, prediction_data, zero_colum_index);
 
 % figure,
 % image(model_pred_image),title('predicted');xlabel('Leaf number');ylabel('Time stamp');
@@ -95,9 +99,39 @@ subplot(1,3,1), image(model_pred_image),title('predicted');xlabel('Leaf number')
 subplot(1,3,2), image(true_image),title('Delevered');xlabel('Leaf number');ylabel('Time stamp');
 subplot(1,3,3), image(planning_image),title('planned');xlabel('Leaf number');ylabel('Time stamp');
 
+%
+selectedDynalogPath_tmp1 = fullfile(testDataIndex(test_data).folder, testDataIndex(test_data).name);
+selectedDynalogSt_temp1 = dynRead(selectedDynalogPath_tmp1)
+
+if testDataIndex(test_data).name(1) == 'A'
+    pairedDynalogFilename = testDataIndex(test_data).name;
+    pairedDynalogFilename = strrep(pairedDynalogFilename, 'A', 'B')
+    selectedDynalogPath_tmp2 = fullfile(testDataIndex(test_data).folder, pairedDynalogFilename);
+    selectedDynalogSt_temp2 = dynRead(selectedDynalogPath_tmp2)
+
+    dynalogA = selectedDynalogSt_temp1;
+    dynalogB = selectedDynalogSt_temp2;
+elseif testDataIndex(test_data).name(1) == 'B'
+    pairedDynalogFilename = testDataIndex(test_data).name;
+    pairedDynalogFilename = strrep(pairedDynalogFilename, 'B', 'A')
+    selectedDynalogPath_tmp2 = fullfile(testDataIndex(test_data).folder, pairedDynalogFilename);
+    selectedDynalogSt_temp2 = dynRead(selectedDynalogPath_tmp2)
+
+    dynalogA = selectedDynalogSt_temp2;
+    dynalogB = selectedDynalogSt_temp1;
+end
+
+3d
+
+
+
+[plannedFluenceMap, actualFluenceMap] = dynFluence(dynalogA, dynalogB, 1, 1);
+dynalogA.actualPosition (11:end)= 
+figure, imshow(aa , [])
+
 %% plot
-n = 30 % 1 ~ 60
-mergedDataTemp = [true_image(:,n), model_pred_image(:,n), planning_image(:,n)]
+leaf_number = 30 % 1 ~ 60
+mergedDataTemp = [true_image(:,leaf_number), model_pred_image(:,leaf_number), planning_image(:,leaf_number)]
 
 for iter05 = 1:size(mergedDataTemp,1)
     temp_RMSE_pred(iter05,1) = sqrt(mean((mergedDataTemp(iter05,1) - mergedDataTemp(iter05,2)).^2));
@@ -115,7 +149,7 @@ hold on
 plot(mergedDataTemp(:,1),'*','MarkerSize',3);
 hold on
 plot(mergedDataTemp(:,3),'^','MarkerSize',3);
-legend('predicted', 'Delevered', 'planned');ylabel(sprintf('Posotion of %dth leaf at isocenter [mm]', n));xlabel('Time stamp');
+legend('predicted', 'Delevered', 'planned');ylabel(sprintf('Posotion of %dth leaf at isocenter [mm]', leaf_number));xlabel('Time stamp');
 grid on
 
 
